@@ -31,7 +31,7 @@
 
   <div class="wrap">
     <div class="card" role="main" aria-live="polite">
-      <div class="note">✨ PARA GRACIELA COME BIEN HOY SI ✨</div>
+      <div class="note">✨ GRACIELA A VER SI FUNCIONA JEJE ✨</div>
       <div class="title">📖 Versículo</div>
       <div id="verse" class="verse">Cargando versículo...</div>
       <div id="ref" class="ref"></div>
@@ -40,11 +40,11 @@
   </div>
 
   <script>
-    // ---------- URL de tu Apps Script (ya insertada) ----------
+    // ---------- URL de tu Apps Script (ya puesta) ----------
     const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhNRt3WxUcyhEVuqwXxPJmmpl1Tk5hpm00vm8l5Kj12_Bz5rB4Ss5ienncdlOM0a_yfPujf8LlTLM7XE17dG0IJaNWIu9KSUs-1m-LO0o5IqfjDzuKcOgBLVFl8MlWSAkWwhBbXBFTVM0lwgz6mbKCJvFeBiszLyn36HQWXBCTwhhdD3qyiDDNOZNNxB0P4LRl1Fetl12QLeD3i9xav_-kmqpdN5x0tUt03hRGrUGoyoDzZ6lluCxc6qqpCh3-oSOuhLM5rPEES8JKKBV73AnMni4VTz80_6djbWYsm&lib=MEwd4MNM1mgaZT9U4-GVYSNvTcetvNt65';
-    // ----------------------------------------------------------
+    // --------------------------------------------------------
 
-    // Nombres de tus imágenes (en la raíz del repo)
+    // tus imágenes (en la raíz del repo)
     const backgrounds = ['hojaazul.jpg','hojaroja.jpg','hojaverde.jpg'];
 
     const bg1 = document.getElementById('bg1');
@@ -56,88 +56,96 @@
     let showFirst = true;
     let lastIndex = -1;
 
-    function loadImg(src, timeout=9000){
-      return new Promise((resolve,reject)=>{
+    function loadImg(src, timeout = 9000) {
+      return new Promise((resolve, reject) => {
         const img = new Image();
         let done = false;
-        const t = setTimeout(()=>{ if(!done){ done=true; reject(new Error('timeout')); } }, timeout);
-        img.onload = ()=>{ if(!done){ done=true; clearTimeout(t); resolve(src); } };
-        img.onerror = ()=>{ if(!done){ done=true; clearTimeout(t); reject(new Error('error')); } };
-        // carga desde el repo (GitHub Pages sirve archivos estáticos)
+        const t = setTimeout(() => { if (!done) { done = true; reject(new Error('timeout')); } }, timeout);
+        img.onload = () => { if (!done) { done = true; clearTimeout(t); resolve(src); } };
+        img.onerror = () => { if (!done) { done = true; clearTimeout(t); reject(new Error('error')); } };
+        // ruta relativa al repo; añadimos cache-bust
         img.src = src + '?v=' + Date.now();
       });
     }
 
-    function pickDifferentIndex(){
-      if(backgrounds.length===0) return -1;
+    function pickDifferentIndex() {
+      if (backgrounds.length === 0) return -1;
       let i;
-      do { i = Math.floor(Math.random()*backgrounds.length); }
-      while(i===lastIndex && backgrounds.length>1);
+      do { i = Math.floor(Math.random() * backgrounds.length); } 
+      while (i === lastIndex && backgrounds.length > 1);
       lastIndex = i;
       return i;
     }
 
-    async function setBackground(){
+    async function setBackgroundSafe() {
       loadingEl.textContent = 'Cargando imagen...';
       const tries = backgrounds.length;
-      for(let attempt=0; attempt<tries; attempt++){
+      for (let attempt = 0; attempt < tries; attempt++) {
         const idx = pickDifferentIndex();
-        const src = backgrounds[idx];
-        try{
-          await loadImg(src,8000);
+        const imgSrc = backgrounds[idx];
+        try {
+          await loadImg(imgSrc, 8000);
           const showEl = showFirst ? bg2 : bg1;
           const hideEl = showFirst ? bg1 : bg2;
-          showEl.style.backgroundImage = url("${src}");
+          showEl.style.backgroundImage = url("${imgSrc}");
           showEl.classList.remove('hidden');
-          setTimeout(()=>{ hideEl.classList.add('hidden'); showFirst = !showFirst; loadingEl.textContent = ''; }, 100);
+          setTimeout(() => { hideEl.classList.add('hidden'); showFirst = !showFirst; loadingEl.textContent = ''; }, 110);
+          console.log('Fondo cargado:', imgSrc);
           return;
-        }catch(e){
-          console.warn('Fallo imagen, probando otra:', e, src);
+        } catch (err) {
+          console.warn('Fallo imagen, probando otra:', err.message || err, imgSrc);
           continue;
         }
       }
-      // fallback gradiente
+      // fallback
       loadingEl.textContent = '';
       const showEl = showFirst ? bg2 : bg1;
       const hideEl = showFirst ? bg1 : bg2;
       showEl.style.backgroundImage = 'linear-gradient(120deg,#0f1724,#1e3a8a)';
       showEl.classList.remove('hidden');
-      setTimeout(()=>{ hideEl.classList.add('hidden'); showFirst = !showFirst; }, 100);
+      setTimeout(() => { hideEl.classList.add('hidden'); showFirst = !showFirst; }, 110);
       console.warn('No se cargó ninguna imagen; fallback activo.');
     }
 
-    async function loadVerseAndBg(){
-      await setBackground();
+    async function loadVerseAndBg() {
+      // primero fondo
+      await setBackgroundSafe();
+
+      // luego versículo
       verseEl.classList.remove('show');
       verseEl.textContent = 'Cargando versículo...';
       refEl.textContent = '';
-      try{
+      try {
         loadingEl.textContent = 'Cargando versículo...';
-        const url = API_URL + (API_URL.includes('?') ? '&' : '?') + '_t=' + Date.now();
-        const res = await fetch(url, {cache:'no-store'});
-        const data = await res.json().catch(()=>null);
-        if(data && data.verse){
-          verseEl.textContent = data.verse;
-          refEl.textContent = data.ref || '';
+        const requestUrl = API_URL + (API_URL.includes('?') ? '&' : '?') + '_t=' + Date.now();
+        console.log('Pidiendo verso a:', requestUrl);
+        const res = await fetch(requestUrl, { cache: 'no-store' });
+        console.log('fetch status:', res.status, res.statusText);
+        // intenta JSON primero
+        const maybeJson = await res.clone().json().catch(()=>null);
+        if (maybeJson && maybeJson.verse) {
+          verseEl.textContent = maybeJson.verse;
+          refEl.textContent = maybeJson.ref || '';
         } else {
-          const txt = await res.text().catch(()=>null);
-          verseEl.textContent = txt || 'No se encontró versículo';
+          // sino, intenta texto plano
+          const text = await res.text().catch(()=>null);
+          verseEl.textContent = text || 'No se encontró versículo';
         }
-      }catch(err){
-        console.error(err);
+      } catch (err) {
+        console.error('Error fetch verso:', err);
         verseEl.textContent = 'Error al cargar el versículo';
-      }finally{
+      } finally {
         loadingEl.textContent = '';
-        setTimeout(()=> verseEl.classList.add('show'), 60);
+        setTimeout(() => verseEl.classList.add('show'), 80);
       }
     }
 
-    // Init rápido
-    (async ()=>{
-      try{
+    // arranque rápido
+    (async () => {
+      try {
         const idx = pickDifferentIndex();
-        await loadImg(backgrounds[idx],400).then(()=>{ bg1.style.backgroundImage = url("${backgrounds[idx]}"); }).catch(()=>{/ignore/});
-      }catch(e){}
+        await loadImg(backgrounds[idx], 400).then(()=> { bg1.style.backgroundImage = url("${backgrounds[idx]}"); }).catch(()=>{/ignore/});
+      } catch(e){}
       loadVerseAndBg();
     })();
   </script>
