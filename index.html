@@ -3,160 +3,118 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Versículo — Inspirado por ti</title>
+  <title>Un Versículo Para Ti</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
-
-  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;500&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --glass: rgba(255,255,255,0.88);
-      --muted: rgba(15,23,42,0.65);
-      --accent: #f6c85f;
+    /* 2. Estilos (Fondo bonito y letra) */
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Inter', sans-serif; /* Letra base */
+      -webkit-font-smoothing: antialiased;
     }
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
-    body{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background: #111;
+    
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
       color: #fff;
-      min-height:100vh;
-      overflow:hidden;
+      text-align: center;
+      overflow: hidden; /* Evita barras de scroll */
     }
 
-    /* fondo dinámico via JS: .bg-layer tiene la imagen */
-    .bg-layer{
-      position:fixed; inset:0; z-index:0;
-      background-position:center;
-      background-size:cover;
-      background-repeat:no-repeat;
-      filter: contrast(0.95) saturate(0.95);
-      transition: opacity 650ms ease, transform 800ms ease;
-      will-change: opacity;
-    }
-    .bg-layer.hidden { opacity: 0; transform: scale(1.02); }
-    .bg-overlay{
-      position:fixed; inset:0; z-index:1;
-      background: linear-gradient(180deg, rgba(4,6,8,0.45), rgba(2,6,20,0.55));
-      backdrop-filter: blur(2px);
+    /* Capa de la imagen de fondo */
+    .background-image {
+      position: fixed;
+      inset: 0; /* Cubre toda la pantalla */
+      z-index: 0;
+      background-position: center;
+      background-size: cover;
+      /* Animación suave al cargar */
+      animation: fadeIn 1.5s ease;
     }
 
-    .wrap{
-      position:relative; z-index:2;
-      width:100%; max-width:920px;
-      padding:38px;
-      box-sizing:border-box;
+    /* Capa oscura sobre la imagen para que el texto se lea bien */
+    .background-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.60));
+      backdrop-filter: blur(2px); /* Efecto cristal */
     }
 
-    .card{
-      margin:0 auto;
-      background: rgba(255,255,255,0.06);
-      border-radius:18px;
-      padding:28px 26px;
-      max-width:760px;
-      box-shadow: 0 12px 40px rgba(2,8,23,0.45);
-      color: #fff;
-      text-align:center;
-      backdrop-filter: blur(6px) saturate(110%);
-      border: 1px solid rgba(255,255,255,0.04);
+    /* Contenedor principal */
+    .wrap {
+      position: relative;
+      z-index: 2;
+      padding: 20px;
+      max-width: 700px; /* Ancho máximo del texto */
     }
 
-    .top-note{
-      font-family: 'Inter', sans-serif;
-      font-weight:700;
-      display:inline-block;
-      padding:8px 14px;
-      border-radius:999px;
-      background: linear-gradient(90deg,#f6c85f,#f0932b);
-      color:#081019;
-      margin-bottom:16px;
-      box-shadow: 0 8px 30px rgba(15,40,80,0.18);
+    /* Saludo para Graciela */
+    .top-note {
+      font-weight: 700;
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #f6c85f, #f0932b);
+      color: #081019;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
     }
 
-    .title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(20px, 3.6vw, 36px);
-      margin: 12px 0 10px;
-      font-weight:700;
-      color: #fff;
-      text-shadow: 0 6px 18px rgba(0,0,0,0.45);
-    }
-
+    /* El versículo (con la letra bonita) */
     .verse {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(16px, 3.8vw, 28px);
-      line-height:1.28;
-      margin: 8px 0 8px;
-      color: #fff;
-      /* Inicia oculto para la animación */
-      opacity:0;
-      transform: translateY(10px);
-      transition: opacity 420ms ease, transform 420ms ease;
-      text-shadow: 0 8px 30px rgba(0,0,0,0.45);
-      min-height: 50px; /* Evita que la caja salte al cargar */
-    }
-    .verse.show { opacity:1; transform:none; }
-
-    .ref {
-      margin-top:8px;
-      color: rgba(255,255,255,0.82);
-      font-weight:600;
-      font-size: 0.95rem;
+      font-family: 'Playfair Display', serif; /* Letra bonita */
+      font-size: clamp(1.75rem, 5vw, 2.25rem); /* Tamaño adaptable */
+      font-weight: 700;
+      line-height: 1.4;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      margin: 0;
     }
 
-    .controls { margin-top:16px; display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap; }
-    .btn {
-      background: rgba(255,255,255,0.08);
-      border:1px solid rgba(255,255,255,0.06);
-      color:#fff;
-      padding:10px 16px;
-      border-radius:999px;
-      cursor:pointer;
-      font-weight:700;
-      transition: transform 160ms ease, background 160ms;
+    /* La referencia (ej. Juan 3:16) */
+    .reference {
+      margin-top: 16px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      font-style: italic;
     }
-    .btn:hover{ transform: translateY(-4px); background: rgba(255,255,255,0.11); }
-
-    .credit { margin-top:14px; color: rgba(255,255,255,0.6); font-size:0.85rem; }
-
-    /* responsive */
-    @media (max-width:520px){
-      .card{ padding:20px; border-radius:14px; }
-      .wrap{ padding:20px; }
+    
+    /* Animación de entrada */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(1.05); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .wrap {
+        animation: fadeIn 1s ease 0.3s;
+        animation-fill-mode: backwards;
     }
   </style>
 </head>
 <body>
-  <div id="bgA" class="bg-layer"></div>
-  <div id="bgB" class="bg-layer hidden"></div>
-  <div class="bg-overlay"></div>
+
+  <div id="bg-main" class="background-image"></div>
+  
+  <div class="background-overlay"></div>
 
   <div class="wrap">
-    <div class="card" role="main" aria-live="polite">
-      <div class="top-note">✨ PARA TI GRACIELA ✨</div>
+    
+    <div class="top-note">✨ PARA TI GRACIELA ✨</div>
 
-      <div class="title">📖 Versículo</div>
-      <div id="verse" class="verse">...</div>
-      <div id="ref" class="ref"></div>
+    <h1 id="verse-text" class="verse"></h1>
+    
+    <p id="verse-ref" class="reference"></p>
 
-      <div class="controls">
-        <button id="newBtn" class="btn" aria-label="Otro versículo">Otro versículo</button>
-        <button id="shareBtn" class="btn" aria-label="Compartir">Compartir</button>
-      </div>
-
-      <div class="credit">Imágenes cortesía de Picsum Photos</div>
-    </div>
   </div>
 
+
   <script>
-    // --------------- CONFIG -----------------
-    
-    // ¡MEJORADO! Lista de versículos interna.
-    // Puedes agregar o cambiar los que quieras aquí.
+    // Lista de versículos (Puedes agregar más)
     const verses = [
       { text: "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", ref: "Juan 3:16" },
       { text: "Todo lo puedo en Cristo que me fortalece.", ref: "Filipenses 4:13" },
@@ -164,136 +122,38 @@
       { text: "Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal, para daros el fin que esperáis.", ref: "Jeremías 29:11" },
       { text: "Venid a mí todos los que estáis trabajados y cargados, y yo os haré descansar.", ref: "Mateo 11:28" },
       { text: "Mas buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.", ref: "Mateo 6:33" },
-      { text: "El amor es paciente, es bondadoso. El amor no es envidioso ni jactancioso ni orgulloso.", ref: "1 Corintios 13:4" },
-      { text: "Y la paz de Dios, que sobrepasa todo entendimiento, guardará vuestros corazones y vuestros pensamientos en Cristo Jesús.", ref: "Filipenses 4:7" },
-      { text: "No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios que te esfuerzo; siempre te ayudaré, siempre te sustentaré con la diestra de mi justicia.", ref: "Isaías 41:10" }
+      { text: "No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios que te esfuerzo; siempre te ayudaré.", ref: "Isaías 41:10" }
     ];
 
-    // ¡MEJORADO! Lista de 20 imágenes de Picsum Photos (más fiables)
+    // Lista de imágenes (URLs de Picsum Photos, son más rápidas)
     const backgrounds = [
-      'https://picsum.photos/seed/img1/1600/900',
-      'https://picsum.photos/seed/img2/1600/900',
-      'https://picsum.photos/seed/img3/1600/900',
-      'https://picsum.photos/seed/img4/1600/900',
-      'https://picsum.photos/seed/img5/1600/900',
-      'https://picsum.photos/seed/img6/1600/900',
-      'https://picsum.photos/seed/img7/1600/900',
-      'https://picsum.photos/seed/img8/1600/900',
-      'https://picsum.photos/seed/img9/1600/900',
-      'https://picsum.photos/seed/img10/1600/900',
-      'https://picsum.photos/seed/img11/1600/900',
-      'https://picsum.photos/seed/img12/1600/900',
-      'https://picsum.photos/seed/img13/1600/900',
-      'https://picsum.photos/seed/img14/1600/900',
-      'https://picsum.photos/seed/img15/1600/900',
-      'https://picsum.photos/seed/img16/1600/900',
-      'https://picsum.photos/seed/img17/1600/900',
-      'https://picsum.photos/seed/img18/1600/900',
-      'https://picsum.photos/seed/img19/1600/900',
-      'https://picsum.photos/seed/img20/1600/900'
+      'https://picsum.photos/seed/nature1/1600/900',
+      'https://picsum.photos/seed/nature2/1600/900',
+      'https://picsum.photos/seed/nature3/1600/900',
+      'https://picsum.photos/seed/nature4/1600/900',
+      'https://picsum.photos/seed/nature5/1600/900',
+      'https://picsum.photos/seed/sunrise1/1600/900',
+      'https://picsum.photos/seed/sunrise2/1600/900',
+      'https://picsum.photos/seed/forest1/1600/900',
+      'https://picsum.photos/seed/ocean1/1600/900',
+      'https://picsum.photos/seed/mountains1/1600/900'
     ];
 
-    // ----------------------------------------
-
-    const bgA = document.getElementById('bgA');
-    const bgB = document.getElementById('bgB');
-    let visibleA = true;
-    let lastBgIndex = -1;
-    let lastVerseIndex = -1;
-
-    // Preload images
-    function preloadAll(arr) {
-      arr.forEach(u => {
-        const i = new Image();
-        i.src = u;
-      });
-    }
-    preloadAll(backgrounds);
-
-    function pickBackgroundIndex() {
-      if (backgrounds.length === 0) return -1;
-      let idx;
-      do { idx = Math.floor(Math.random() * backgrounds.length); }
-      while (idx === lastBgIndex && backgrounds.length > 1);
-      lastBgIndex = idx;
-      return idx;
-    }
-
-    function setBackground(url) {
-      const show = visibleA ? bgB : bgA;
-      const hide = visibleA ? bgA : bgB;
+    // Esta función se ejecuta en cuanto carga la página
+    document.addEventListener('DOMContentLoaded', () => {
       
-      // ¡CORREGIDO! La sintaxis aquí era incorrecta.
-      // Ahora usa backticks (`) para crear el string de CSS correctamente.
-      show.style.backgroundImage = \`url("${url}")\`;
+      // 1. Escoger un versículo al azar
+      const randomVerse = verses[Math.floor(Math.random() * verses.length)];
       
-      show.classList.remove('hidden');
-      setTimeout(()=> {
-        hide.classList.add('hidden');
-        visibleA = !visibleA;
-      }, 60);
-    }
+      // 2. Escoger una imagen al azar
+      const randomBg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
 
-    // ¡SIMPLIFICADO! Esta función ahora toma los versículos de la lista interna.
-    function loadVerse() {
-      const verseEl = document.getElementById('verse');
-      const refEl = document.getElementById('ref');
-
-      // Ocultar el verso actual para animar el nuevo
-      verseEl.classList.remove('show');
-
-      // Escoger un versículo al azar de nuestra lista interna
-      let idx;
-      do {
-        idx = Math.floor(Math.random() * verses.length);
-      } while (idx === lastVerseIndex && verses.length > 1);
-      lastVerseIndex = idx;
-      const verse = verses[idx];
-
-      // Poner el texto
-      verseEl.textContent = verse.text;
-      refEl.textContent = verse.ref;
-
-      // Mostrar con animación
-      setTimeout(()=> verseEl.classList.add('show'), 40);
-
-      // Cambiar el fondo
-      const bgIdx = pickBackgroundIndex();
-      if (bgIdx >= 0) setBackground(backgrounds[bgIdx]);
-    }
-
-    // Eventos
-    document.getElementById('newBtn').addEventListener('click', loadVerse);
-
-    // ¡MEJORADO! El botón de compartir ahora también copia al portapapeles.
-    document.getElementById('shareBtn').addEventListener('click', async ()=>{
-      const verseText = document.getElementById('verse').textContent || '';
-      const refText = document.getElementById('ref').textContent || '';
-      const fullText = \`"${verseText}" (${refText})\`;
-
-      // Intentar compartir con la API nativa (móvil)
-      if (navigator.share) {
-        try {
-          await navigator.share({ title: 'Un versículo para ti', text: fullText });
-        } catch(e) {
-          console.log('Share cancelado', e);
-        }
-      // Fallback: copiar al portapapeles (PC)
-      } else if (navigator.clipboard) {
-        try {
-          await navigator.clipboard.writeText(fullText);
-          alert('¡Versículo copiado al portapapeles!');
-        } catch (e) {
-          prompt('Copia el versículo:', fullText);
-        }
-      // Fallback más antiguo
-      } else {
-        prompt('Copia el versículo:', fullText);
-      }
+      // 3. Poner el contenido en la página
+      document.getElementById('verse-text').textContent = randomVerse.text;
+      document.getElementById('verse-ref').textContent = randomVerse.ref;
+      document.getElementById('bg-main').style.backgroundImage = \`url("${randomBg}")\`;
     });
-
-    // ¡CORREGIDO! Cargar el primer versículo y fondo al abrir la página.
-    loadVerse();
   </script>
+
 </body>
 </html>
