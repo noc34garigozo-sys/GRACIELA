@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Versículo — Inspirado por ti</title>
 
-  <!-- Fuentes -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
 
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
@@ -93,10 +92,12 @@
       line-height:1.28;
       margin: 8px 0 8px;
       color: #fff;
+      /* Inicia oculto para la animación */
       opacity:0;
       transform: translateY(10px);
       transition: opacity 420ms ease, transform 420ms ease;
       text-shadow: 0 8px 30px rgba(0,0,0,0.45);
+      min-height: 50px; /* Evita que la caja salte al cargar */
     }
     .verse.show { opacity:1; transform:none; }
 
@@ -130,7 +131,6 @@
   </style>
 </head>
 <body>
-  <!-- Capas de fondo (2 para crossfade) -->
   <div id="bgA" class="bg-layer"></div>
   <div id="bgB" class="bg-layer hidden"></div>
   <div class="bg-overlay"></div>
@@ -140,7 +140,7 @@
       <div class="top-note">✨ PARA TI GRACIELA ✨</div>
 
       <div class="title">📖 Versículo</div>
-      <div id="verse" class="verse">Cargando versículo...</div>
+      <div id="verse" class="verse">...</div>
       <div id="ref" class="ref"></div>
 
       <div class="controls">
@@ -148,47 +148,49 @@
         <button id="shareBtn" class="btn" aria-label="Compartir">Compartir</button>
       </div>
 
-      <div class="credit">Imágenes cortesía de Unsplash · Diseño por ti</div>
+      <div class="credit">Imágenes cortesía de Picsum Photos</div>
     </div>
   </div>
 
   <script>
     // --------------- CONFIG -----------------
-    // Pega aquí tu Apps Script Web App URL (termina en /exec)
-    const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhNRt3WxUcyhEVuqwXxPJmmpl1Tk5hpm00vm8l5Kj12_Bz5rB4Ss5ienncdlOM0a_yfPujf8LlTLM7XE17dG0IJaNWIu9KSUs-1m-LO0o5IqfjDzuKcOgBLVFl8MlWSAkWwhBbXBFTVM0lwgz6mbKCJvFeBiszLyn36HQWXBCTwhhdD3qyiDDNOZNNxB0P4LRl1Fetl12QLeD3i9xav_-kmqpdN5x0tUt03hRGrUGoyoDzZ6lluCxc6qqpCh3-oSOuhLM5rPEES8JKKBV73AnMni4VTz80_6djbWYsm&lib=MEwd4MNM1mgaZT9U4-GVYSNvTcetvNt65';
+    
+    // ¡MEJORADO! Lista de versículos interna.
+    // Puedes agregar o cambiar los que quieras aquí.
+    const verses = [
+      { text: "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", ref: "Juan 3:16" },
+      { text: "Todo lo puedo en Cristo que me fortalece.", ref: "Filipenses 4:13" },
+      { text: "El Señor es mi pastor; nada me faltará.", ref: "Salmo 23:1" },
+      { text: "Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal, para daros el fin que esperáis.", ref: "Jeremías 29:11" },
+      { text: "Venid a mí todos los que estáis trabajados y cargados, y yo os haré descansar.", ref: "Mateo 11:28" },
+      { text: "Mas buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.", ref: "Mateo 6:33" },
+      { text: "El amor es paciente, es bondadoso. El amor no es envidioso ni jactancioso ni orgulloso.", ref: "1 Corintios 13:4" },
+      { text: "Y la paz de Dios, que sobrepasa todo entendimiento, guardará vuestros corazones y vuestros pensamientos en Cristo Jesús.", ref: "Filipenses 4:7" },
+      { text: "No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios que te esfuerzo; siempre te ayudaré, siempre te sustentaré con la diestra de mi justicia.", ref: "Isaías 41:10" }
+    ];
 
-    // Lista de 30 imágenes (Unsplash) — puedes editarlas / agregar más
+    // ¡MEJORADO! Lista de 20 imágenes de Picsum Photos (más fiables)
     const backgrounds = [
-      'https://source.unsplash.com/1600x900/?mountain',
-      'https://source.unsplash.com/1600x900/?sunrise',
-      'https://source.unsplash.com/1600x900/?sunset',
-      'https://source.unsplash.com/1600x900/?forest',
-      'https://source.unsplash.com/1600x900/?beach',
-      'https://source.unsplash.com/1600x900/?sea',
-      'https://source.unsplash.com/1600x900/?river',
-      'https://source.unsplash.com/1600x900/?waterfall',
-      'https://source.unsplash.com/1600x900/?lake',
-      'https://source.unsplash.com/1600x900/?valley',
-      'https://source.unsplash.com/1600x900/?island',
-      'https://source.unsplash.com/1600x900/?field',
-      'https://source.unsplash.com/1600x900/?flowers',
-      'https://source.unsplash.com/1600x900/?forest,trees',
-      'https://source.unsplash.com/1600x900/?desert',
-      'https://source.unsplash.com/1600x900/?snow',
-      'https://source.unsplash.com/1600x900/?ice',
-      'https://source.unsplash.com/1600x900/?night,stars',
-      'https://source.unsplash.com/1600x900/?clouds',
-      'https://source.unsplash.com/1600x900/?fog',
-      'https://source.unsplash.com/1600x900/?road',
-      'https://source.unsplash.com/1600x900/?canyon',
-      'https://source.unsplash.com/1600x900/?cliff',
-      'https://source.unsplash.com/1600x900/?ocean',
-      'https://source.unsplash.com/1600x900/?dawn',
-      'https://source.unsplash.com/1600x900/?dusk',
-      'https://source.unsplash.com/1600x900/?meadow',
-      'https://source.unsplash.com/1600x900/?mountain,lake',
-      'https://source.unsplash.com/1600x900/?trees,river',
-      'https://source.unsplash.com/1600x900/?butterfly'
+      'https://picsum.photos/seed/img1/1600/900',
+      'https://picsum.photos/seed/img2/1600/900',
+      'https://picsum.photos/seed/img3/1600/900',
+      'https://picsum.photos/seed/img4/1600/900',
+      'https://picsum.photos/seed/img5/1600/900',
+      'https://picsum.photos/seed/img6/1600/900',
+      'https://picsum.photos/seed/img7/1600/900',
+      'https://picsum.photos/seed/img8/1600/900',
+      'https://picsum.photos/seed/img9/1600/900',
+      'https://picsum.photos/seed/img10/1600/900',
+      'https://picsum.photos/seed/img11/1600/900',
+      'https://picsum.photos/seed/img12/1600/900',
+      'https://picsum.photos/seed/img13/1600/900',
+      'https://picsum.photos/seed/img14/1600/900',
+      'https://picsum.photos/seed/img15/1600/900',
+      'https://picsum.photos/seed/img16/1600/900',
+      'https://picsum.photos/seed/img17/1600/900',
+      'https://picsum.photos/seed/img18/1600/900',
+      'https://picsum.photos/seed/img19/1600/900',
+      'https://picsum.photos/seed/img20/1600/900'
     ];
 
     // ----------------------------------------
@@ -197,6 +199,7 @@
     const bgB = document.getElementById('bgB');
     let visibleA = true;
     let lastBgIndex = -1;
+    let lastVerseIndex = -1;
 
     // Preload images
     function preloadAll(arr) {
@@ -217,65 +220,80 @@
     }
 
     function setBackground(url) {
-      // crossfade between bgA and bgB
       const show = visibleA ? bgB : bgA;
       const hide = visibleA ? bgA : bgB;
-      show.style.backgroundImage = url("${url}#${Date.now()}"); // cache-bust
+      
+      // ¡CORREGIDO! La sintaxis aquí era incorrecta.
+      // Ahora usa backticks (`) para crear el string de CSS correctamente.
+      show.style.backgroundImage = \`url("${url}")\`;
+      
       show.classList.remove('hidden');
       setTimeout(()=> {
         hide.classList.add('hidden');
         visibleA = !visibleA;
-      }, 60); // small delay to trigger transition
+      }, 60);
     }
 
-    async function loadVerse() {
+    // ¡SIMPLIFICADO! Esta función ahora toma los versículos de la lista interna.
+    function loadVerse() {
       const verseEl = document.getElementById('verse');
       const refEl = document.getElementById('ref');
-      try {
-        verseEl.classList.remove('show');
-        verseEl.textContent = 'Cargando versículo...';
-        // Cache-bust
-        const url = API_URL + (API_URL.includes('?') ? '&' : '?') + '_t=' + Date.now();
-        const res = await fetch(url, { cache: 'no-store' });
-        const data = await res.json();
-        if (data.error) {
-          verseEl.textContent = 'Error: ' + data.error;
-        } else {
-          verseEl.textContent = data.verse || String(data || '');
-        }
-        // show animated
-        setTimeout(()=> verseEl.classList.add('show'), 40);
-        refEl.textContent = data.ref || '';
-      } catch (err) {
-        verseEl.textContent = 'Error al cargar el versículo';
-        console.error(err);
-      } finally {
-        // cambiar fondo al mismo tiempo
-        const idx = pickBackgroundIndex();
-        if (idx >= 0) setBackground(backgrounds[idx]);
-      }
+
+      // Ocultar el verso actual para animar el nuevo
+      verseEl.classList.remove('show');
+
+      // Escoger un versículo al azar de nuestra lista interna
+      let idx;
+      do {
+        idx = Math.floor(Math.random() * verses.length);
+      } while (idx === lastVerseIndex && verses.length > 1);
+      lastVerseIndex = idx;
+      const verse = verses[idx];
+
+      // Poner el texto
+      verseEl.textContent = verse.text;
+      refEl.textContent = verse.ref;
+
+      // Mostrar con animación
+      setTimeout(()=> verseEl.classList.add('show'), 40);
+
+      // Cambiar el fondo
+      const bgIdx = pickBackgroundIndex();
+      if (bgIdx >= 0) setBackground(backgrounds[bgIdx]);
     }
 
     // Eventos
-    document.getElementById('newBtn').addEventListener('click', ()=>{
-      loadVerse();
-    });
+    document.getElementById('newBtn').addEventListener('click', loadVerse);
 
+    // ¡MEJORADO! El botón de compartir ahora también copia al portapapeles.
     document.getElementById('shareBtn').addEventListener('click', async ()=>{
       const verseText = document.getElementById('verse').textContent || '';
+      const refText = document.getElementById('ref').textContent || '';
+      const fullText = \`"${verseText}" (${refText})\`;
+
+      // Intentar compartir con la API nativa (móvil)
       if (navigator.share) {
-        try { await navigator.share({ title: 'Versículo', text: verseText, url: location.href }); }
-        catch(e){ console.log('share canceled', e); }
+        try {
+          await navigator.share({ title: 'Un versículo para ti', text: fullText });
+        } catch(e) {
+          console.log('Share cancelado', e);
+        }
+      // Fallback: copiar al portapapeles (PC)
+      } else if (navigator.clipboard) {
+        try {
+          await navigator.clipboard.writeText(fullText);
+          alert('¡Versículo copiado al portapapeles!');
+        } catch (e) {
+          prompt('Copia el versículo:', fullText);
+        }
+      // Fallback más antiguo
       } else {
-        prompt('Copia el versículo:', verseText);
+        prompt('Copia el versículo:', fullText);
       }
     });
 
-    // init
-    // set initial background quickly
-    setBackground(backgrounds[Math.floor(Math.random()*backgrounds.length)]);
-    // load verse after small delay so background shows
-    setTimeout(loadVerse, 300);
+    // ¡CORREGIDO! Cargar el primer versículo y fondo al abrir la página.
+    loadVerse();
   </script>
 </body>
 </html>
