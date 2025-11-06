@@ -21,7 +21,6 @@
       color:#fff;
     }
 
-    /* Dos capas para crossfade */
     .bg-layer{
       position:fixed; inset:0; z-index:0;
       background-position:center;
@@ -96,10 +95,10 @@
       font-size: 0.95rem;
     }
 
-    /* mensaje de carga */
     .loading {
       font-size: 0.95rem;
       color: rgba(255,255,255,0.8);
+      margin-top:8px;
     }
 
     @media (max-width:520px){
@@ -109,7 +108,6 @@
   </style>
 </head>
 <body>
-  <!-- Capas de fondo para crossfade -->
   <div id="bg1" class="bg-layer"></div>
   <div id="bg2" class="bg-layer hidden"></div>
   <div class="overlay"></div>
@@ -126,45 +124,18 @@
   </div>
 
   <script>
-    // ---------- CONFIG: reemplaza por tu URL real ----------
+    // ---------- YA PUSE TU SCRIPT AQUÍ ----------
     const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhNRt3WxUcyhEVuqwXxPJmmpl1Tk5hpm00vm8l5Kj12_Bz5rB4Ss5ienncdlOM0a_yfPujf8LlTLM7XE17dG0IJaNWIu9KSUs-1m-LO0o5IqfjDzuKcOgBLVFl8MlWSAkWwhBbXBFTVM0lwgz6mbKCJvFeBiszLyn36HQWXBCTwhhdD3qyiDDNOZNNxB0P4LRl1Fetl12QLeD3i9xav_-kmqpdN5x0tUt03hRGrUGoyoDzZ6lluCxc6qqpCh3-oSOuhLM5rPEES8JKKBV73AnMni4VTz80_6djbWYsm&lib=MEwd4MNM1mgaZT9U4-GVYSNvTcetvNt65';
-    // -------------------------------------------------------
+    // ---------------------------------------------
 
-    // Lista de imágenes (Unsplash). Si alguna falla el código probará otra.
+    // -- Usa las 3 imágenes que subiste a tu repo dentro de images/ --
+    // Asegúrate de que hayas subido: images/fondo1.jpg, images/fondo2.jpg, images/fondo3.jpg
     const backgrounds = [
-      'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-2b8a8f1e9e4b?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-6a0a5f8e2b21?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-1a7a7a3c2f5c?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-3b8b2f2e4c7e?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-9b9b3f3d3c1b?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-7c7c6f6d6b1a?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-8d8d7e7f7a2b?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-4e4e5f5a5b3c?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-5f5f6a6b6c4d?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-0a0a1b1c1d2e?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-2c2c3d3e3f4a?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-6b6b7c7d7e8f?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-8f8f9a9b9c0d?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-a1a1b2b2c3d4?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1501785888041-c1c1d2d2e3f4?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1470770903676-69b98201ea1c?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1500530855697-02d05ec2b4dd?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1469474968028-3a3a3a3a3a3a?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1441829266145-bc4e7a3b8a10?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1454789548928-9efd52dc4031?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1469474968028-9aa9aa9aa9aa?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1500530855697-5f8f8f8f8f8f?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=1600&q=80',
-      'https://images.unsplash.com/photo-1500530855697-1a1a1a1a1a1a?auto=format&fit=crop&w=1600&q=80'
+      'hojaazul.jpg',
+      'hojaroja.jpg',
+      'hojaverde.jpg'
     ];
 
-    // DOM
     const bg1 = document.getElementById('bg1');
     const bg2 = document.getElementById('bg2');
     const verseEl = document.getElementById('verse');
@@ -174,22 +145,20 @@
     let showingFirst = true;
     let lastIndex = -1;
 
-    // Función para intentar cargar una imagen y resolver cuando esté lista
-    function loadImage(url, timeoutMs = 8000) {
+    function loadImage(imgUrl, timeoutMs = 9000) {
       return new Promise((resolve, reject) => {
         const img = new Image();
         let settled = false;
         const timer = setTimeout(()=> {
           if (!settled) { settled = true; reject(new Error('timeout')); }
         }, timeoutMs);
-        img.onload = () => { if (!settled) { settled = true; clearTimeout(timer); resolve(url); } };
+        img.onload = () => { if (!settled) { settled = true; clearTimeout(timer); resolve(imgUrl); } };
         img.onerror = ()=> { if (!settled) { settled = true; clearTimeout(timer); reject(new Error('error')); } };
-        // Cache bust small to avoid stale CDN issues
-        img.src = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+        // carga desde el mismo repo; no cache-bust necesario pero lo dejo pequeño
+        img.src = imgUrl + '?v=' + Date.now();
       });
     }
 
-    // Escoge un índice distinto al anterior
     function pickIndex() {
       if (backgrounds.length === 0) return -1;
       let i;
@@ -201,41 +170,43 @@
 
     async function setBackgroundSafe() {
       loadingEl.textContent = 'Cargando imagen...';
-      const start = Date.now();
       const tries = backgrounds.length;
       for (let attempt = 0; attempt < tries; attempt++) {
         const idx = pickIndex();
-        const url = backgrounds[idx];
+        const imgUrl = backgrounds[idx];
         try {
-          await loadImage(url, 9000); // espera a que cargue
-          // aplicar a la capa oculta y crossfade
+          await loadImage(imgUrl);
           const showEl = showingFirst ? bg2 : bg1;
           const hideEl = showingFirst ? bg1 : bg2;
-          showEl.style.backgroundImage = url("${url}");
+          showEl.style.backgroundImage = url("${imgUrl}");
           showEl.classList.remove('hidden');
-          // pequeño delay para permitir transición
           setTimeout(()=> {
             hideEl.classList.add('hidden');
             showingFirst = !showingFirst;
             loadingEl.textContent = '';
-          }, 80);
-          return; // éxito
+          }, 120);
+          return;
         } catch (e) {
-          // fallo en esa imagen: intenta otra
-          console.warn('Imagen fallo, probando otra:', e, url);
+          console.warn('Imagen fallo, probando otra:', e, imgUrl);
           continue;
         }
       }
-      // si ninguna cargó
-      loadingEl.textContent = ''; // no mostrar error al usuario
-      console.warn('No se pudo cargar ninguna imagen de fondo.');
+      // fallback: degradado
+      loadingEl.textContent = '';
+      const showEl = showingFirst ? bg2 : bg1;
+      const hideEl = showingFirst ? bg1 : bg2;
+      showEl.style.backgroundImage = linear-gradient(120deg, #0f1724, #1e3a8a);
+      showEl.classList.remove('hidden');
+      setTimeout(()=> {
+        hideEl.classList.add('hidden');
+        showingFirst = !showingFirst;
+      }, 120);
+      console.warn('No se pudo cargar ninguna imagen de fondo; usando fallback.');
     }
 
     async function loadVerseAndBackground() {
-      // cargar fondo primero (si quieres que verse espere hasta que fondo cargue, puedes descomentar)
       await setBackgroundSafe();
 
-      // luego pedir versiculo
       verseEl.classList.remove('show');
       verseEl.textContent = 'Cargando versículo...';
       refEl.textContent = '';
@@ -243,37 +214,34 @@
         loadingEl.textContent = 'Cargando versículo...';
         const url = API_URL + (API_URL.includes('?') ? '&' : '?') + '_t=' + Date.now();
         const res = await fetch(url, { cache: 'no-store' });
-        const data = await res.json();
-        if (data.error) {
-          verseEl.textContent = 'Error: ' + data.error;
-        } else {
-          verseEl.textContent = data.verse || String(data || '');
+        // apps script devuelve JSON {verse: "..."} en tu script
+        const data = await res.json().catch(()=>null);
+        if (data && data.verse) {
+          verseEl.textContent = data.verse;
           refEl.textContent = data.ref || '';
+        } else {
+          // fallback si devuelve texto plano
+          const text = await res.text().catch(()=>null);
+          verseEl.textContent = text || 'No se encontró versículo';
         }
       } catch (err) {
         console.error(err);
         verseEl.textContent = 'Error al cargar el versículo';
       } finally {
         loadingEl.textContent = '';
-        // animar aparición
-        setTimeout(()=> verseEl.classList.add('show'), 60);
+        setTimeout(()=> verseEl.classList.add('show'), 80);
       }
     }
 
-    // Inicial: establecer una imagen rápidamente (no bloqueante)
+    // inicio rápido
     (async ()=> {
-      // intentar pre-carga breve para mostrar algo rápido
       try {
         const idx = pickIndex();
         await loadImage(backgrounds[idx], 500).then(()=> {
           bg1.style.backgroundImage = url("${backgrounds[idx]}");
-        }).catch(()=> {/* ignore */});
-      } catch {}
-      // luego carga completa
+        }).catch(()=>{/* ignore */});
+      } catch(e){}
       loadVerseAndBackground();
-      // cada vez que el usuario recargue la página se obtendrá nuevo verso y fondo
-      // también actualizamos automáticamente cada X segundos (opcional)
-      // setInterval(loadVerseAndBackground, 1000*60*3); // cada 3 minutos si quieres
     })();
   </script>
 </body>
