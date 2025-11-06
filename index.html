@@ -31,8 +31,8 @@
 
   <div class="wrap">
     <div class="card" role="main" aria-live="polite">
-      <div class="note">✨ GRACIELA A VER SI FUNCIONA estoy cansadito ✨</div>
-      <div class="title">📖</div>
+      <div class="note">✨ GRACIELA A VER SI FUNCIONA JEJE ✨</div>
+      <div class="title">📖 Versículo</div>
       <div id="verse" class="verse">Cargando versículo...</div>
       <div id="ref" class="ref"></div>
       <div id="loading" class="loading"></div>
@@ -44,8 +44,14 @@
     const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhNRt3WxUcyhEVuqwXxPJmmpl1Tk5hpm00vm8l5Kj12_Bz5rB4Ss5ienncdlOM0a_yfPujf8LlTLM7XE17dG0IJaNWIu9KSUs-1m-LO0o5IqfjDzuKcOgBLVFl8MlWSAkWwhBbXBFTVM0lwgz6mbKCJvFeBiszLyn36HQWXBCTwhhdD3qyiDDNOZNNxB0P4LRl1Fetl12QLeD3i9xav_-kmqpdN5x0tUt03hRGrUGoyoDzZ6lluCxc6qqpCh3-oSOuhLM5rPEES8JKKBV73AnMni4VTz80_6djbWYsm&lib=MEwd4MNM1mgaZT9U4-GVYSNvTcetvNt65';
     // --------------------------------------------------------
 
-    // tus imágenes (en la raíz del repo)
-    const backgrounds = ['hojaazul.jpg','hojaroja.jpg','hojaverde.jpg'];
+    // --- ¡CAMBIO AQUÍ! (Línea 43) ---
+    // Puse las URLs completas (raw) de GitHub
+    const backgrounds = [
+      'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaazul.jpg',
+      'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaroja.jpg',
+      'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaverde.jpg'
+    ];
+    // --- Fin del Cambio ---
 
     const bg1 = document.getElementById('bg1');
     const bg2 = document.getElementById('bg2');
@@ -87,9 +93,8 @@
           await loadImg(imgSrc, 8000);
           const showEl = showFirst ? bg2 : bg1;
           const hideEl = showFirst ? bg1 : bg2;
-          // --- ¡CORRECCIÓN AQUÍ! (Línea 93) ---
+          // (Esta línea ya estaba bien gracias a la corrección anterior)
           showEl.style.backgroundImage = `url("${imgSrc}")`;
-          // --- Fin Corrección ---
           showEl.classList.remove('hidden');
           setTimeout(() => { hideEl.classList.add('hidden'); showFirst = !showFirst; loadingEl.textContent = ''; }, 110);
           console.log('Fondo cargado:', imgSrc);
@@ -139,16 +144,15 @@
       } finally {
         loadingEl.textContent = '';
         setTimeout(() => verseEl.classList.add('show'), 80);
-      }
+D      }
     }
 
     // arranque rápido
     (async () => {
       try {
         const idx = pickDifferentIndex();
-        // --- ¡CORRECCIÓN AQUÍ! (Línea 146) ---
+        // (Esta línea ya estaba bien gracias a la corrección anterior)
         await loadImg(backgrounds[idx], 400).then(()=> { bg1.style.backgroundImage = `url("${backgrounds[idx]}")`; }).catch(()=>{/ignore/});
-        // --- Fin Corrección ---
       } catch(e){}
       loadVerseAndBg();
     })();
