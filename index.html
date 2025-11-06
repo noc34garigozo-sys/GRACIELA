@@ -3,157 +3,278 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Un Versículo Para Ti</title>
+  <title>Versículo — Inspirado por ti</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;500&display=swap" rel="stylesheet">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
 
   <style>
-    /* 2. Estilos (Fondo bonito y letra) */
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: 'Inter', sans-serif; /* Letra base */
-      -webkit-font-smoothing: antialiased;
-    }
-    
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      color: #fff;
-      text-align: center;
-      overflow: hidden; /* Evita barras de scroll */
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+    body{
+      background:#000;
+      min-height:100vh;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
     }
 
-    /* Capa de la imagen de fondo */
-    .background-image {
-      position: fixed;
-      inset: 0; /* Cubre toda la pantalla */
-      z-index: 0;
-      background-position: center;
-      background-size: cover;
-      /* Animación suave al cargar */
-      animation: fadeIn 1.5s ease;
+    /* Dos capas para crossfade */
+    .bg-layer{
+      position:fixed; inset:0; z-index:0;
+      background-position:center;
+      background-size:cover;
+      background-repeat:no-repeat;
+      transition: opacity 700ms ease, transform 700ms ease;
+      will-change: opacity;
+      opacity:1;
+    }
+    .bg-layer.hidden { opacity: 0; transform: scale(1.02); }
+
+    .overlay {
+      position:fixed; inset:0; z-index:1;
+      background: linear-gradient(180deg, rgba(6,10,14,0.42), rgba(4,8,16,0.56));
+      backdrop-filter: blur(2px);
     }
 
-    /* Capa oscura sobre la imagen para que el texto se lea bien */
-    .background-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.60));
-      backdrop-filter: blur(2px); /* Efecto cristal */
+    .wrap{
+      position:relative; z-index:2;
+      width:100%; max-width:960px; padding:36px;
+      box-sizing:border-box;
+      display:flex; align-items:center; justify-content:center;
     }
 
-    /* Contenedor principal */
-    .wrap {
-      position: relative;
-      z-index: 2;
-      padding: 20px;
-      max-width: 700px; /* Ancho máximo del texto */
+    .card{
+      width:100%;
+      background: rgba(0,0,0,0.28);
+      border-radius:14px;
+      padding:28px 26px;
+      text-align:center;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.03);
+      color:#fff;
+      backdrop-filter: blur(4px) saturate(120%);
     }
 
-    /* Saludo para Graciela */
-    .top-note {
-      font-weight: 700;
-      display: inline-block;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #f6c85f, #f0932b);
-      color: #081019;
-      margin-bottom: 24px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    .top-note{
+      display:inline-block;
+      padding:8px 14px;
+      border-radius:999px;
+      background: linear-gradient(90deg,#ffd89b,#19547b);
+      color:#06101a;
+      font-weight:700;
+      margin-bottom:12px;
+      box-shadow: 0 6px 18px rgba(9,30,66,0.08);
     }
 
-    /* El versículo (con la letra bonita) */
+    .title {
+      font-family: "Georgia", "Playfair Display", serif;
+      font-size: clamp(18px, 3.6vw, 28px);
+      margin: 10px 0;
+      font-weight:700;
+      text-shadow: 0 6px 18px rgba(0,0,0,0.45);
+    }
+
     .verse {
-      font-family: 'Playfair Display', serif; /* Letra bonita */
-      font-size: clamp(1.75rem, 5vw, 2.25rem); /* Tamaño adaptable */
-      font-weight: 700;
-      line-height: 1.4;
-      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
-      margin: 0;
+      font-family: "Georgia", "Playfair Display", serif;
+      font-size: clamp(16px, 4.2vw, 30px);
+      line-height:1.28;
+      margin: 12px 6px;
+      opacity:0;
+      transform: translateY(8px);
+      transition: opacity 420ms ease, transform 420ms ease;
+      text-shadow: 0 8px 28px rgba(0,0,0,0.45);
+    }
+    .verse.show { opacity:1; transform:none; }
+
+    .ref {
+      margin-top:12px;
+      color: rgba(255,255,255,0.85);
+      font-weight:600;
+      font-size: 0.95rem;
     }
 
-    /* La referencia (ej. Juan 3:16) */
-    .reference {
-      margin-top: 16px;
-      font-size: 1.1rem;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.85);
-      font-style: italic;
+    /* mensaje de carga */
+    .loading {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.8);
     }
-    
-    /* Animación de entrada */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(1.05); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    .wrap {
-        animation: fadeIn 1s ease 0.3s;
-        animation-fill-mode: backwards;
+
+    @media (max-width:520px){
+      .card{ padding:18px; border-radius:12px; }
+      .wrap{ padding:18px; }
     }
   </style>
 </head>
 <body>
-
-  <div id="bg-main" class="background-image"></div>
-  
-  <div class="background-overlay"></div>
+  <!-- Capas de fondo para crossfade -->
+  <div id="bg1" class="bg-layer"></div>
+  <div id="bg2" class="bg-layer hidden"></div>
+  <div class="overlay"></div>
 
   <div class="wrap">
-    
-    <div class="top-note">✨ PARA TI GRACIELA ✨</div>
+    <div class="card" role="main" aria-live="polite">
+      <div class="top-note">✨ PARA TI GRACIELA ✨</div>
+      <div class="title">📖 Versículo</div>
 
-    <h1 id="verse-text" class="verse"></h1>
-    
-    <p id="verse-ref" class="reference"></p>
-
+      <div id="verse" class="verse">Cargando versículo...</div>
+      <div id="ref" class="ref"></div>
+      <div id="loading" class="loading" aria-hidden="true"></div>
+    </div>
   </div>
 
-
   <script>
-    // Lista de versículos (Puedes agregar más)
-    const verses = [
-      { text: "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.", ref: "Juan 3:16" },
-      { text: "Todo lo puedo en Cristo que me fortalece.", ref: "Filipenses 4:13" },
-      { text: "El Señor es mi pastor; nada me faltará.", ref: "Salmo 23:1" },
-      { text: "Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal, para daros el fin que esperáis.", ref: "Jeremías 29:11" },
-      { text: "Venid a mí todos los que estáis trabajados y cargados, y yo os haré descansar.", ref: "Mateo 11:28" },
-      { text: "Mas buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.", ref: "Mateo 6:33" },
-      { text: "No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios que te esfuerzo; siempre te ayudaré.", ref: "Isaías 41:10" }
-    ];
+    // ---------- CONFIG: reemplaza por tu URL real ----------
+    const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhNRt3WxUcyhEVuqwXxPJmmpl1Tk5hpm00vm8l5Kj12_Bz5rB4Ss5ienncdlOM0a_yfPujf8LlTLM7XE17dG0IJaNWIu9KSUs-1m-LO0o5IqfjDzuKcOgBLVFl8MlWSAkWwhBbXBFTVM0lwgz6mbKCJvFeBiszLyn36HQWXBCTwhhdD3qyiDDNOZNNxB0P4LRl1Fetl12QLeD3i9xav_-kmqpdN5x0tUt03hRGrUGoyoDzZ6lluCxc6qqpCh3-oSOuhLM5rPEES8JKKBV73AnMni4VTz80_6djbWYsm&lib=MEwd4MNM1mgaZT9U4-GVYSNvTcetvNt65';
+    // -------------------------------------------------------
 
-    // Lista de imágenes (URLs de Picsum Photos, son más rápidas)
+    // Lista de imágenes (Unsplash). Si alguna falla el código probará otra.
     const backgrounds = [
-      'https://picsum.photos/seed/nature1/1600/900',
-      'https://picsum.photos/seed/nature2/1600/900',
-      'https://picsum.photos/seed/nature3/1600/900',
-      'https://picsum.photos/seed/nature4/1600/900',
-      'https://picsum.photos/seed/nature5/1600/900',
-      'https://picsum.photos/seed/sunrise1/1600/900',
-      'https://picsum.photos/seed/sunrise2/1600/900',
-      'https://picsum.photos/seed/forest1/1600/900',
-      'https://picsum.photos/seed/ocean1/1600/900',
-      'https://picsum.photos/seed/mountains1/1600/900'
+      'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-2b8a8f1e9e4b?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-6a0a5f8e2b21?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-1a7a7a3c2f5c?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-3b8b2f2e4c7e?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-9b9b3f3d3c1b?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-7c7c6f6d6b1a?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-8d8d7e7f7a2b?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-4e4e5f5a5b3c?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-5f5f6a6b6c4d?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-0a0a1b1c1d2e?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-2c2c3d3e3f4a?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-6b6b7c7d7e8f?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-8f8f9a9b9c0d?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-a1a1b2b2c3d4?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1501785888041-c1c1d2d2e3f4?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1470770903676-69b98201ea1c?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1500530855697-02d05ec2b4dd?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1469474968028-3a3a3a3a3a3a?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1441829266145-bc4e7a3b8a10?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1454789548928-9efd52dc4031?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1469474968028-9aa9aa9aa9aa?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1500530855697-5f8f8f8f8f8f?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1500530855697-1a1a1a1a1a1a?auto=format&fit=crop&w=1600&q=80'
     ];
 
-    // Esta función se ejecuta en cuanto carga la página
-    document.addEventListener('DOMContentLoaded', () => {
-      
-      // 1. Escoger un versículo al azar
-      const randomVerse = verses[Math.floor(Math.random() * verses.length)];
-      
-      // 2. Escoger una imagen al azar
-      const randomBg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+    // DOM
+    const bg1 = document.getElementById('bg1');
+    const bg2 = document.getElementById('bg2');
+    const verseEl = document.getElementById('verse');
+    const refEl = document.getElementById('ref');
+    const loadingEl = document.getElementById('loading');
 
-      // 3. Poner el contenido en la página
-      document.getElementById('verse-text').textContent = randomVerse.text;
-      document.getElementById('verse-ref').textContent = randomVerse.ref;
-      document.getElementById('bg-main').style.backgroundImage = \`url("${randomBg}")\`;
-    });
+    let showingFirst = true;
+    let lastIndex = -1;
+
+    // Función para intentar cargar una imagen y resolver cuando esté lista
+    function loadImage(url, timeoutMs = 8000) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        let settled = false;
+        const timer = setTimeout(()=> {
+          if (!settled) { settled = true; reject(new Error('timeout')); }
+        }, timeoutMs);
+        img.onload = () => { if (!settled) { settled = true; clearTimeout(timer); resolve(url); } };
+        img.onerror = ()=> { if (!settled) { settled = true; clearTimeout(timer); reject(new Error('error')); } };
+        // Cache bust small to avoid stale CDN issues
+        img.src = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+      });
+    }
+
+    // Escoge un índice distinto al anterior
+    function pickIndex() {
+      if (backgrounds.length === 0) return -1;
+      let i;
+      do { i = Math.floor(Math.random() * backgrounds.length); }
+      while (i === lastIndex && backgrounds.length > 1);
+      lastIndex = i;
+      return i;
+    }
+
+    async function setBackgroundSafe() {
+      loadingEl.textContent = 'Cargando imagen...';
+      const start = Date.now();
+      const tries = backgrounds.length;
+      for (let attempt = 0; attempt < tries; attempt++) {
+        const idx = pickIndex();
+        const url = backgrounds[idx];
+        try {
+          await loadImage(url, 9000); // espera a que cargue
+          // aplicar a la capa oculta y crossfade
+          const showEl = showingFirst ? bg2 : bg1;
+          const hideEl = showingFirst ? bg1 : bg2;
+          showEl.style.backgroundImage = url("${url}");
+          showEl.classList.remove('hidden');
+          // pequeño delay para permitir transición
+          setTimeout(()=> {
+            hideEl.classList.add('hidden');
+            showingFirst = !showingFirst;
+            loadingEl.textContent = '';
+          }, 80);
+          return; // éxito
+        } catch (e) {
+          // fallo en esa imagen: intenta otra
+          console.warn('Imagen fallo, probando otra:', e, url);
+          continue;
+        }
+      }
+      // si ninguna cargó
+      loadingEl.textContent = ''; // no mostrar error al usuario
+      console.warn('No se pudo cargar ninguna imagen de fondo.');
+    }
+
+    async function loadVerseAndBackground() {
+      // cargar fondo primero (si quieres que verse espere hasta que fondo cargue, puedes descomentar)
+      await setBackgroundSafe();
+
+      // luego pedir versiculo
+      verseEl.classList.remove('show');
+      verseEl.textContent = 'Cargando versículo...';
+      refEl.textContent = '';
+      try {
+        loadingEl.textContent = 'Cargando versículo...';
+        const url = API_URL + (API_URL.includes('?') ? '&' : '?') + '_t=' + Date.now();
+        const res = await fetch(url, { cache: 'no-store' });
+        const data = await res.json();
+        if (data.error) {
+          verseEl.textContent = 'Error: ' + data.error;
+        } else {
+          verseEl.textContent = data.verse || String(data || '');
+          refEl.textContent = data.ref || '';
+        }
+      } catch (err) {
+        console.error(err);
+        verseEl.textContent = 'Error al cargar el versículo';
+      } finally {
+        loadingEl.textContent = '';
+        // animar aparición
+        setTimeout(()=> verseEl.classList.add('show'), 60);
+      }
+    }
+
+    // Inicial: establecer una imagen rápidamente (no bloqueante)
+    (async ()=> {
+      // intentar pre-carga breve para mostrar algo rápido
+      try {
+        const idx = pickIndex();
+        await loadImage(backgrounds[idx], 500).then(()=> {
+          bg1.style.backgroundImage = url("${backgrounds[idx]}");
+        }).catch(()=> {/* ignore */});
+      } catch {}
+      // luego carga completa
+      loadVerseAndBackground();
+      // cada vez que el usuario recargue la página se obtendrá nuevo verso y fondo
+      // también actualizamos automáticamente cada X segundos (opcional)
+      // setInterval(loadVerseAndBackground, 1000*60*3); // cada 3 minutos si quieres
+    })();
   </script>
-
 </body>
 </html>
