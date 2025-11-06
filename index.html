@@ -1,159 +1,154 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Versículo — Inspirado por ti</title>
-  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
-  <meta http-equiv="Pragma" content="no-cache"/>
-  <meta http-equiv="Expires" content="0"/>
-  <style>
-    html,body{height:100%;margin:0;font-family:Arial,Helvetica,sans-serif; /* --- CAMBIO AQUÍ --- */ background:transparent; /* Antes: #000 */ color:#fff;}
-    body{display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden;}
-    .bg{position:fixed;inset:0;z-index:0;background-position:center;background-size:cover;background-repeat:no-repeat;transition:opacity .6s,transform .6s;}
-    .bg.hidden{opacity:0;transform:scale(1.02);}
-    /* --- CAMBIO AQUÍ: `z-index` y `background` --- */
-    .overlay{position:fixed;inset:0;z-index:1; background:none; /* Antes: linear-gradient(...) */}
-    /* --- Fin Cambios --- */
-    .wrap{position:relative;z-index:2;max-width:900px;width:100%;padding:30px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;}
-    .card{width:100%;background:rgba(0,0,0,0.3);border-radius:12px;padding:28px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
-    .note{display:inline-block;padding:8px 14px;border-radius:999px;background:linear-gradient(90deg,#ffd89b,#19547b);color:#041018;font-weight:700;margin-bottom:12px;}
-    .title{font-family:Georgia, 'Times New Roman', serif;font-size:22px;margin:8px 0;}
-    .verse{font-family:Georgia,serif;font-size:20px;line-height:1.3;margin:12px 6px;opacity:0;transform:translateY(8px);transition:opacity .35s, transform .35s;}
-    .verse.show{opacity:1;transform:none;}
-    .ref{margin-top:10px;color:rgba(255,255,255,0.85);font-weight:600;}
-    .loading{margin-top:10px;color:rgba(255,255,255,0.7);}
-    @media(max-width:520px){.card{padding:18px}.title{font-size:18px}.verse{font-size:18px}}
-  </style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Versículo — Inspirado por ti</title>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <style>
+    html,body{height:100%;margin:0;font-family:Arial,Helvetica,sans-serif;background:#000;color:#fff;}
+    body{display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden;}
+    /* capas de fondo */
+    .bg{position:fixed;inset:0;z-index:0;background-position:center;background-size:cover;background-repeat:no-repeat;transition:opacity .6s,transform .6s;}
+    .bg.hidden{opacity:0;transform:scale(1.02);}
+    /* overlay con degradado para contraste (IMPORTANTE) */
+    .overlay{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.55));pointer-events:none;}
+    .wrap{position:relative;z-index:2;max-width:900px;width:100%;padding:30px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;}
+    .card{width:100%;background:rgba(0,0,0,0.25);border-radius:12px;padding:28px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
+    .note{display:inline-block;padding:8px 14px;border-radius:999px;background:linear-gradient(90deg,#ffd89b,#19547b);color:#041018;font-weight:700;margin-bottom:12px;}
+    .title{font-family:Georgia, 'Times New Roman', serif;font-size:22px;margin:8px 0;color:#fff;}
+    .verse{font-family:Georgia,serif;font-size:20px;line-height:1.3;margin:12px 6px;color:#fff;opacity:0;transform:translateY(8px);transition:opacity .35s, transform .35s;}
+    .verse.show{opacity:1;transform:none;}
+    .ref{margin-top:10px;color:rgba(255,255,255,0.95);font-weight:600;}
+    .loading{margin-top:10px;color:rgba(255,255,255,0.8);}
+    @media(max-width:520px){.card{padding:18px}.title{font-size:18px}.verse{font-size:18px}}
+  </style>
 </head>
 <body>
-  <div id="bg1" class="bg"></div>
-  <div id="bg2" class="bg hidden"></div>
-  <div class="overlay"></div>
+  <div id="bg1" class="bg"></div>
+  <div id="bg2" class="bg hidden"></div>
+  <div class="overlay"></div>
 
-  <div class="wrap">
-    <div class="card" role="main" aria-live="polite">
-      <div class="note">✨ GRACIELA intentamos aun ✨</div>
-      <div class="title">📖</div>
-      <div id="verse" class="verse">Cargando versículo...</div>
-      <div id="ref" class="ref"></div>
-      <div id="loading" class="loading"></div>
-    </div>
-  </div>
+  <div class="wrap">
+    <div class="card" role="main" aria-live="polite">
+      <div class="note">✨ GRACIELA  ✨</div>
+      <div class="title">📖 Versículo</div>
+      <div id="verse" class="verse">Cargando versículo...</div>
+      <div id="ref" class="ref"></div>
+      <div id="loading" class="loading"></div>
+    </div>
+  </div>
 
-  <script>
-    // ---------- URL de tu Apps Script (RESTAURADA A LA VERSIÓN FUNCIONAL) ----------
-    const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhNRt3WxUcyhEVuqwXxPJmmpl1Tk5hpm00vm8l5Kj12_Bz5rB4Ss5ienncdlOM0a_yfPujf8LlTLM7XE17dG0IJaNWIu9KSUs-1m-LO0o5IqfjDzuKcOgBLVFl8MlWSAkWwhBbXBFTVM0lwgz6mbKCJvFeBiszLyn36HQWXBCTwhhdD3qyiDDNOZNNxB0P4LRl1Fetl12QLeD3i9xav_-kmqpdN5x0tUt03hRGrUGoyoDzZ6lluCxc6qqpCh3-oSOuhLM5rPEES8JKKBV73AnMni4VTz80_6djbWYsm&lib=MEwd4MNM1mgaZT9U4-GVYSNvTcetvNt65';
-    // --------------------------------------------------------
+  <script>
+    // ----- TU SCRIPT YA INSERTADO -----
+    const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhNRt3WxUcyhEVuqwXxPJmmpl1Tk5hpm00vm8l5Kj12_Bz5rB4Ss5ienncdlOM0a_yfPujf8LlTLM7XE17dG0IJaNWIu9KSUs-1m-LO0o5IqfjDzuKcOgBLVFl8MlWSAkWwhBbXBFTVM0lwgz6mbKCJvFeBiszLyn36HQWXBCTwhhdD3qyiDDNOZNNxB0P4LRl1Fetl12QLeD3i9xav_-kmqpdN5x0tUt03hRGrUGoyoDzZ6lluCxc6qqpCh3-oSOuhLM5rPEES8JKKBV73AnMni4VTz80_6djbWYsm&lib=MEwd4MNM1mgaZT9U4-GVYSNvTcetvNt65';
+    // ----------------------------------
 
-    // URLs completas de GitHub (estas ya estaban bien)
-    const backgrounds = [
-      'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaazul.jpg',
-      'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaroja.jpg',
-      'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaverde.jpg'
-    ];
+    // URLs directas a tus imágenes en GitHub (raw)
+    const backgrounds = [
+      'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaazul.jpg',
+      'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaroja.jpg',
+      'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaverde.jpg'
+    ];
 
-    const bg1 = document.getElementById('bg1');
-    const bg2 = document.getElementById('bg2');
-    const verseEl = document.getElementById('verse');
-    const refEl = document.getElementById('ref');
-    const loadingEl = document.getElementById('loading');
+    const bg1 = document.getElementById('bg1'), bg2 = document.getElementById('bg2');
+    const verseEl = document.getElementById('verse'), refEl = document.getElementById('ref'), loadingEl = document.getElementById('loading');
 
-    let showFirst = true;
-    let lastIndex = -1;
+    let showFirst = true, lastIndex = -1;
 
-    function loadImg(src, timeout = 9000) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        let done = false;
-        const t = setTimeout(() => { if (!done) { done = true; reject(new Error('timeout')); } }, timeout);
-        img.onload = () => { if (!done) { done = true; clearTimeout(t); resolve(src); } };
-        img.onerror = () => { if (!done) { done = true; clearTimeout(t); reject(new Error('error')); } };
-        // ruta completa; añadimos cache-bust
-        img.src = src + '?v=' + Date.now();
-      });
-    }
+    function loadImg(src, timeout = 9000){
+      return new Promise((resolve,reject)=>{
+        const img = new Image();
+        let done = false;
+        const t = setTimeout(()=>{ if(!done){ done=true; reject(new Error('timeout')); } }, timeout);
+        img.onload = ()=>{ if(!done){ done=true; clearTimeout(t); resolve(src); } };
+        img.onerror = ()=>{ if(!done){ done=true; clearTimeout(t); reject(new Error('error')); } };
+        // asigna la URL (cache-bust para forzar nueva carga)
+        img.src = src + '?v=' + Date.now();
+      });
+    }
 
-    function pickDifferentIndex() {
-      if (backgrounds.length === 0) return -1;
-      let i;
-      do { i = Math.floor(Math.random() * backgrounds.length); } 
-      while (i === lastIndex && backgrounds.length > 1);
-      lastIndex = i;
-      return i;
-    }
+    function pickDifferentIndex(){
+      if(backgrounds.length===0) return -1;
+      let i;
+      do { i = Math.floor(Math.random()*backgrounds.length); } while(i===lastIndex && backgrounds.length>1);
+      lastIndex = i;
+      return i;
+    }
 
-    async function setBackgroundSafe() {
-      loadingEl.textContent = 'Cargando imagen...';
-      const tries = backgrounds.length;
-      for (let attempt = 0; attempt < tries; attempt++) {
-        const idx = pickDifferentIndex();
-        const imgSrc = backgrounds[idx];
-        try {
-          await loadImg(imgSrc, 8000);
-          const showEl = showFirst ? bg2 : bg1;
-          const hideEl = showFirst ? bg1 : bg2;
-          showEl.style.backgroundImage = `url("${imgSrc}")`;
-          showEl.classList.remove('hidden');
-          setTimeout(() => { hideEl.classList.add('hidden'); showFirst = !showFirst; loadingEl.textContent = ''; }, 110);
-          console.log('Fondo cargado:', imgSrc);
-          return;
-        } catch (err) {
-          console.warn('Fallo imagen, probando otra:', err.message || err, imgSrc);
-          continue;
-        }
-      }
-      // fallback
-      loadingEl.textContent = '';
-      const showEl = showFirst ? bg2 : bg1;
-      const hideEl = showFirst ? bg1 : bg2;
-      showEl.style.backgroundImage = 'linear-gradient(120deg,#0f1724,#1e3a8a)';
-      showEl.classList.remove('hidden');
-      setTimeout(() => { hideEl.classList.add('hidden'); showFirst = !showFirst; }, 110);
-      console.warn('No se cargó ninguna imagen; fallback activo.');
-    }
+    async function setBackgroundSafe(){
+      loadingEl.textContent = 'Cargando imagen...';
+      const tries = backgrounds.length;
+      for(let attempt=0; attempt<tries; attempt++){
+        const idx = pickDifferentIndex();
+        const src = backgrounds[idx];
+        try{
+          console.log('Intentando cargar imagen:', src);
+          await loadImg(src,8000);
+          const showEl = showFirst ? bg2 : bg1;
+          const hideEl = showFirst ? bg1 : bg2;
+          showEl.style.backgroundImage = url("${src}");
+          showEl.classList.remove('hidden');
+          setTimeout(()=>{ hideEl.classList.add('hidden'); showFirst = !showFirst; loadingEl.textContent=''; }, 120);
+          console.log('Fondo cargado OK:', src);
+          return;
+        } catch(e){
+          console.warn('Fallo imagen, probando otra:', e.message || e, src);
+          continue;
+        }
+      }
+      // fallback (gradiente) si nada carga
+      loadingEl.textContent = '';
+      const showEl = showFirst ? bg2 : bg1;
+      const hideEl = showFirst ? bg1 : bg2;
+      showEl.style.backgroundImage = 'linear-gradient(120deg,#0f1724,#1e3a8a)';
+      showEl.classList.remove('hidden');
+      setTimeout(()=>{ hideEl.classList.add('hidden'); showFirst = !showFirst; }, 120);
+      console.warn('No se cargó ninguna imagen; uso fallback gradiente.');
+    }
 
-    async function loadVerseAndBg() {
-      // primero fondo
-      await setBackgroundSafe();
+    async function loadVerseAndBg(){
+      await setBackgroundSafe();
 
-      // luego versículo
-      verseEl.classList.remove('show');
-      verseEl.textContent = 'Cargando versículo...';
-      refEl.textContent = '';
-      try {
-        loadingEl.textContent = 'Cargando versículo...';
-        const requestUrl = API_URL + (API_URL.includes('?') ? '&' : '?') + '_t=' + Date.now();
-        console.log('Pidiendo verso a:', requestUrl);
-        const res = await fetch(requestUrl, { cache: 'no-store' });
-        console.log('fetch status:', res.status, res.statusText);
-        // intenta JSON primero
-        const maybeJson = await res.clone().json().catch(()=>null);
-        if (maybeJson && maybeJson.verse) {
-          verseEl.textContent = maybeJson.verse;
-          refEl.textContent = maybeJson.ref || '';
-        } else {
-          // sino, intenta texto plano
-          const text = await res.text().catch(()=>null);
-          verseEl.textContent = text || 'No se encontró versículo';
-        }
-      } catch (err) {
-        console.error('Error fetch verso:', err);
-        verseEl.textContent = 'Error al cargar el versículo';
-      } finally {
-        loadingEl.textContent = '';
-        setTimeout(() => verseEl.classList.add('show'), 80);
-      }
-    }
+      verseEl.classList.remove('show');
+      verseEl.textContent = 'Cargando versículo...';
+      refEl.textContent = '';
+      try{
+        loadingEl.textContent = 'Cargando versículo...';
+        const requestUrl = API_URL + (API_URL.includes('?') ? '&' : '?') + '_t=' + Date.now();
+        console.log('Pidiendo verso a:', requestUrl);
+        const res = await fetch(requestUrl, { cache: 'no-store' });
+        console.log('fetch status:', res.status, res.statusText);
+        const maybeJson = await res.clone().json().catch(()=>null);
+        if(maybeJson && maybeJson.verse){
+          verseEl.textContent = maybeJson.verse;
+          refEl.textContent = maybeJson.ref || '';
+        } else {
+          const txt = await res.text().catch(()=>null);
+          verseEl.textContent = txt || 'No se encontró versículo';
+        }
+      } catch(err){
+        console.error('Error fetch verso:', err);
+        verseEl.textContent = 'Error al cargar el versículo';
+      } finally {
+        loadingEl.textContent = '';
+        setTimeout(()=> verseEl.classList.add('show'), 80);
+      }
+    }
 
-    // arranque rápido
-    (async () => {
-      try {
-        const idx = pickDifferentIndex();
-        await loadImg(backgrounds[idx], 400).then(()=> { bg1.style.backgroundImage = `url("${backgrounds[idx]}")`; }).catch(()=>{/ignore/});
-      } catch(e){}
-      loadVerseAndBg();
-    })();
-  </script>
+    // arranque
+    (async ()=>{
+      // prueba rápida: intenta mostrar una imagen rápidamente
+      try{
+        const idx = pickDifferentIndex();
+        await loadImg(backgrounds[idx], 400).then(()=>{ bg1.style.backgroundImage = url("${backgrounds[idx]}"); })
+          .catch(()=>{/* ignore */});
+      }catch(e){}
+      // carga completa
+      loadVerseAndBg();
+    })();
+  </script>
 </body>
 </html>
