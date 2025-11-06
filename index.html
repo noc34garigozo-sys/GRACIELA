@@ -8,13 +8,13 @@
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
   <style>
-    html,body{height:100%;margin:0;font-family:Arial,Helvetica,sans-serif;background:#000;color:#fff;}
+    html,body{height:100%;margin:0;font-family:Arial,Helvetica,sans-serif; /* --- CAMBIO AQUÍ --- */ background:transparent; /* Antes: #000 */ color:#fff;}
     body{display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden;}
     .bg{position:fixed;inset:0;z-index:0;background-position:center;background-size:cover;background-repeat:no-repeat;transition:opacity .6s,transform .6s;}
     .bg.hidden{opacity:0;transform:scale(1.02);}
-    /* --- ¡CORRECCIÓN AQUÍ! (Línea 21) --- */
-    .overlay{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,0.45),rgba(0,0,0,0.6));}
-    /* --- Fin Corrección --- */
+    /* --- CAMBIO AQUÍ: `z-index` y `background` --- */
+    .overlay{position:fixed;inset:0;z-index:1; background:none; /* Antes: linear-gradient(...) */}
+    /* --- Fin Cambios --- */
     .wrap{position:relative;z-index:2;max-width:900px;width:100%;padding:30px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;}
     .card{width:100%;background:rgba(0,0,0,0.3);border-radius:12px;padding:28px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
     .note{display:inline-block;padding:8px 14px;border-radius:999px;background:linear-gradient(90deg,#ffd89b,#19547b);color:#041018;font-weight:700;margin-bottom:12px;}
@@ -33,8 +33,8 @@
 
   <div class="wrap">
     <div class="card" role="main" aria-live="polite">
-      <div class="note">✨ GRACIELA A VER SI FUNCIONA JEJE ✨</div>
-      <div class="title">📖 Versículo</div>
+      <div class="note">✨ GRACIELA intentamos aun ✨</div>
+      <div class="title">📖</div>
       <div id="verse" class="verse">Cargando versículo...</div>
       <div id="ref" class="ref"></div>
       <div id="loading" class="loading"></div>
@@ -42,11 +42,11 @@
   </div>
 
   <script>
-    // ---------- URL de tu Apps Script (ya puesta) ----------
-    const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhNRt3WxUcyhEVuqwXxPJmmpl1Tk5hpm00vm8l5Kj12_Bz5rB4Ss5ienncdlOM0a_yfPujf8LlTLM7XE17dG0IJaNWIu9KSUs-1m-LO0o5hIqfjDzuKcOgBLVFl8MlWSAkWwhBbXBFTVM0lwgz6mbKCJvFeBiszLyn36HQWXBCTwhhdD3qyiDDNOZNNxB0P4LRl1Fetl12QLeD3i9xav_-kmqpdN5x0tUt03hRGrUGoyoDzZ6lluCxc6qqpCh3-oSOuhLM5rPEES8JKKBV73AnMni4VTz80_6djbWYsm&lib=MEwd4MNM1mgaZT9U4-GVYSNvTcetvNt65';
+    // ---------- URL de tu Apps Script (RESTAURADA A LA VERSIÓN FUNCIONAL) ----------
+    const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhNRt3WxUcyhEVuqwXxPJmmpl1Tk5hpm00vm8l5Kj12_Bz5rB4Ss5ienncdlOM0a_yfPujf8LlTLM7XE17dG0IJaNWIu9KSUs-1m-LO0o5IqfjDzuKcOgBLVFl8MlWSAkWwhBbXBFTVM0lwgz6mbKCJvFeBiszLyn36HQWXBCTwhhdD3qyiDDNOZNNxB0P4LRl1Fetl12QLeD3i9xav_-kmqpdN5x0tUt03hRGrUGoyoDzZ6lluCxc6qqpCh3-oSOuhLM5rPEES8JKKBV73AnMni4VTz80_6djbWYsm&lib=MEwd4MNM1mgaZT9U4-GVYSNvTcetvNt65';
     // --------------------------------------------------------
 
-    // URLs completas de GitHub
+    // URLs completas de GitHub (estas ya estaban bien)
     const backgrounds = [
       'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaazul.jpg',
       'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaroja.jpg',
