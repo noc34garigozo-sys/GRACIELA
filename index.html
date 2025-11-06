@@ -12,7 +12,9 @@
     body{display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden;}
     .bg{position:fixed;inset:0;z-index:0;background-position:center;background-size:cover;background-repeat:no-repeat;transition:opacity .6s,transform .6s;}
     .bg.hidden{opacity:0;transform:scale(1.02);}
-    .overlay{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,0.45),rgba(0,0,0,0.6));}
+    /* --- ¡CORRECCIÓN AQUÍ! (Línea 21) --- */
+    .overlay{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,0.45),rgba(0,0,0,0.6));}
+    /* --- Fin Corrección --- */
     .wrap{position:relative;z-index:2;max-width:900px;width:100%;padding:30px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;}
     .card{width:100%;background:rgba(0,0,0,0.3);border-radius:12px;padding:28px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
     .note{display:inline-block;padding:8px 14px;border-radius:999px;background:linear-gradient(90deg,#ffd89b,#19547b);color:#041018;font-weight:700;margin-bottom:12px;}
@@ -41,17 +43,15 @@
 
   <script>
     // ---------- URL de tu Apps Script (ya puesta) ----------
-    const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhNRt3WxUcyhEVuqwXxPJmmpl1Tk5hpm00vm8l5Kj12_Bz5rB4Ss5ienncdlOM0a_yfPujf8LlTLM7XE17dG0IJaNWIu9KSUs-1m-LO0o5IqfjDzuKcOgBLVFl8MlWSAkWwhBbXBFTVM0lwgz6mbKCJvFeBiszLyn36HQWXBCTwhhdD3qyiDDNOZNNxB0P4LRl1Fetl12QLeD3i9xav_-kmqpdN5x0tUt03hRGrUGoyoDzZ6lluCxc6qqpCh3-oSOuhLM5rPEES8JKKBV73AnMni4VTz80_6djbWYsm&lib=MEwd4MNM1mgaZT9U4-GVYSNvTcetvNt65';
+    const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhNRt3WxUcyhEVuqwXxPJmmpl1Tk5hpm00vm8l5Kj12_Bz5rB4Ss5ienncdlOM0a_yfPujf8LlTLM7XE17dG0IJaNWIu9KSUs-1m-LO0o5hIqfjDzuKcOgBLVFl8MlWSAkWwhBbXBFTVM0lwgz6mbKCJvFeBiszLyn36HQWXBCTwhhdD3qyiDDNOZNNxB0P4LRl1Fetl12QLeD3i9xav_-kmqpdN5x0tUt03hRGrUGoyoDzZ6lluCxc6qqpCh3-oSOuhLM5rPEES8JKKBV73AnMni4VTz80_6djbWYsm&lib=MEwd4MNM1mgaZT9U4-GVYSNvTcetvNt65';
     // --------------------------------------------------------
 
-    // --- ¡CAMBIO AQUÍ! (Línea 43) ---
-    // Puse las URLs completas (raw) de GitHub
+    // URLs completas de GitHub
     const backgrounds = [
       'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaazul.jpg',
       'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaroja.jpg',
       'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaverde.jpg'
     ];
-    // --- Fin del Cambio ---
 
     const bg1 = document.getElementById('bg1');
     const bg2 = document.getElementById('bg2');
@@ -69,7 +69,7 @@
         const t = setTimeout(() => { if (!done) { done = true; reject(new Error('timeout')); } }, timeout);
         img.onload = () => { if (!done) { done = true; clearTimeout(t); resolve(src); } };
         img.onerror = () => { if (!done) { done = true; clearTimeout(t); reject(new Error('error')); } };
-        // ruta relativa al repo; añadimos cache-bust
+        // ruta completa; añadimos cache-bust
         img.src = src + '?v=' + Date.now();
       });
     }
@@ -93,7 +93,6 @@
           await loadImg(imgSrc, 8000);
           const showEl = showFirst ? bg2 : bg1;
           const hideEl = showFirst ? bg1 : bg2;
-          // (Esta línea ya estaba bien gracias a la corrección anterior)
           showEl.style.backgroundImage = `url("${imgSrc}")`;
           showEl.classList.remove('hidden');
           setTimeout(() => { hideEl.classList.add('hidden'); showFirst = !showFirst; loadingEl.textContent = ''; }, 110);
@@ -144,14 +143,13 @@
       } finally {
         loadingEl.textContent = '';
         setTimeout(() => verseEl.classList.add('show'), 80);
-D      }
+      }
     }
 
     // arranque rápido
     (async () => {
       try {
         const idx = pickDifferentIndex();
-        // (Esta línea ya estaba bien gracias a la corrección anterior)
         await loadImg(backgrounds[idx], 400).then(()=> { bg1.style.backgroundImage = `url("${backgrounds[idx]}")`; }).catch(()=>{/ignore/});
       } catch(e){}
       loadVerseAndBg();
