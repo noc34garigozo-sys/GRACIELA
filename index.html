@@ -40,8 +40,9 @@
   </div>
 
   <script>
-    // Tu Apps Script (ya insertado)
-    const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLiU6ApIH_pOCtca6nmgMD32nazTyNG5Q1LhwKtS2vuNq0m2U5amcy-G_ZdXUHO0h4EHcA0GCElZcLEbWdsyiueTStG2rWiIGpuIPfr3PJqI4Z0yvAkRqX6pFXpZwzairgnbQQBexuXmdCzlD-H37VVyD4jCupTOZqKFWNjAC6H1P92PjWjrGOSQ6WQDBWMr4skdgYuCiD6SyZ6FKiTa0YqwxF21w5OMAAzXmM82AQ0KWW7tGOeIzX4n1MHWNljh6EVXY9ZgFY4ODzH7uXdanxX2xrHoj5E4qshfHjfj&lib=MEwd4MNM1mgaZT9U4-GVYSNvTcetvNt65';
+    // ---------- CONFIG: pon aquí la URL EXACTA de tu Web App (deploy) ----------
+    const API_URL = 'https://script.google.com/macros/s/AKfycbz9m6e3NoSYdRu3FYSHb5UY_lDo50_q6XzNKmhcR4cgIYROgHdmxCWsyhysqWJlMfcksw/exec';
+    // ------------------------------------------------------------------------
 
     // URLs raw (tu repo)
     const backgrounds = [
@@ -50,12 +51,14 @@
       'https://raw.githubusercontent.com/noc34garigozo-sys/GRACIELA/main/hojaverde.jpg'
     ];
 
+    // DOM
     const bg1 = document.getElementById('bg1');
     const bg2 = document.getElementById('bg2');
     const verseEl = document.getElementById('verse');
     const refEl = document.getElementById('ref');
     const loadingEl = document.getElementById('loading');
 
+    // fondo
     let showFirst = true;
     let lastIndex = -1;
 
@@ -66,7 +69,6 @@
         const t = setTimeout(() => { if (!done) { done = true; reject(new Error('timeout')); } }, timeout);
         img.onload = () => { if (!done) { done = true; clearTimeout(t); resolve(src); } };
         img.onerror = () => { if (!done) { done = true; clearTimeout(t); reject(new Error('error')); } };
-        // asigna la URL
         img.src = src + '?v=' + Date.now();
       });
     }
@@ -89,7 +91,6 @@
         try {
           console.log('Intentando cargar imagen:', src);
           await loadImg(src, 8000);
-          // ASIGNACIÓN SEGURA sin backticks que puedan romperse
           const showEl = showFirst ? bg2 : bg1;
           const hideEl = showFirst ? bg1 : bg2;
           showEl.style.backgroundImage = 'url(' + src + ')';
@@ -102,7 +103,7 @@
           continue;
         }
       }
-      // fallback
+      // fallback gradiente
       loadingEl.textContent = '';
       const showEl = showFirst ? bg2 : bg1;
       const hideEl = showFirst ? bg1 : bg2;
@@ -112,41 +113,60 @@
       console.warn('No se cargó ninguna imagen; fallback gradiente.');
     }
 
-    async function loadVerseAndBg() {
-      await setBackgroundSafe();
+    // --------------------- Construir URL de API correctamente ---------------------
+    function buildApiUrl(paramName, token) {
+      // API_URL debe ser la URL de deploy tipo script.google.com/.../exec sin parámetros
+      const sep = API_URL.includes('?') ? '&' : '?';
+      return API_URL + sep + encodeURIComponent(paramName) + '=' + encodeURIComponent(token) + '&_t=' + Date.now();
+    }
 
-      verseEl.classList.remove('show');
-      verseEl.textContent = 'Cargando versículo...';
-      refEl.textContent = '';
+    // cargar verso para token view
+    async function loadVerseForToken(token) {
+      if (!token) return;
       try {
         loadingEl.textContent = 'Cargando versículo...';
-        const requestUrl = API_URL + (API_URL.includes('?') ? '&' : '?') + '_t=' + Date.now();
-        console.log('Pidiendo verso a:', requestUrl);
-        const res = await fetch(requestUrl, { cache: 'no-store' });
+        const url = buildApiUrl('view', token);
+        console.log('Pidiendo verso a:', url);
+        const res = await fetch(url, { cache: 'no-store' });
         console.log('fetch status:', res.status, res.statusText);
-        const maybeJson = await res.clone().json().catch(()=>null);
-        if (maybeJson && maybeJson.verse) {
-          verseEl.textContent = maybeJson.verse;
-          refEl.textContent = maybeJson.ref || '';
+        const json = await res.json().catch(()=>null);
+        if (json && json.verse) {
+          verseEl.textContent = json.verse;
+          refEl.textContent = json.index ? 'Verso núm. ' + json.index : '';
         } else {
           const txt = await res.text().catch(()=>null);
           verseEl.textContent = txt || 'No se encontró versículo';
         }
       } catch (err) {
         console.error('Error fetch verso:', err);
-        verseEl.textContent = 'Error al cargar el versículo';
+        verseEl.textContent = 'Error al cargar versículo';
       } finally {
         loadingEl.textContent = '';
-        setTimeout(()=> verseEl.classList.add('show'), 80);
+        setTimeout(()=> verseEl.classList.add('show'), 60);
       }
     }
 
-    (async () => {
+    // helper: obtener param view de la URL
+    function getViewParam() {
       try {
-        const idx = pickDifferentIndex();
-        await loadImg(backgrounds[idx], 400).then(()=> { bg1.style.backgroundImage = 'url(' + backgrounds[idx] + ')'; }).catch(()=>{/* ignore */});
-      } catch(e){}
-      loadVerseAndBg();
+        const p = new URLSearchParams(window.location.search);
+        return p.get('view');
+      } catch(e) {
+        return null;
+      }
+    }
+
+    // init
+    (async ()=> {
+      try { await setBackgroundSafe(); } catch(e){}
+      const token = getViewParam();
+      if (token) {
+        await loadVerseForToken(token);
+      } else {
+        // mensaje por defecto si no hay view param
+        verseEl.textContent = 'Acerca la manilla NFC para obtener el versículo.';
+        verseEl.classList.add('show');
+      }
     })();
   </script>
 </body>
